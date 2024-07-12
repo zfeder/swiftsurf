@@ -17,6 +17,3 @@ struct swiftsurf: App {
         }
     }
 }
-
-
-
