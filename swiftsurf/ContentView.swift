@@ -11,44 +11,74 @@ import WebKit
 struct ContentView: View {
     @State private var urlString: String = "https://www.google.it"
     @StateObject private var webViewStore = WebViewStore()
+    @AppStorage("homePage") private var homePage: String = "https://www.google.it"
 
     var body: some View {
-        VStack {
-            HStack {
-                Button(action: {
-                    goBack()
-                }) {
-                    Image(systemName: "arrow.left")
-                }
-                .padding(.leading, 8)
+        ZStack {
+            VStack {
+                HStack {
+                    Button(action: {
+                        goBack()
+                    }) {
+                        Image(systemName: "arrow.left")
+                    }
+                    .padding(.leading, 8)
 
-                TextField("Enter URL", text: $urlString, onCommit: {
-                    loadURL()
-                })
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .frame(maxWidth: .infinity)
-                .padding([.leading, .trailing], 8)
+                    Button(action: {
+                        goHome()
+                    }) {
+                        Image(systemName: "house")
+                    }
+                    .padding(.leading, 8)
 
-                Button(action: {
-                    reloadPage()
-                }) {
-                    Image(systemName: "arrow.clockwise")
+                    TextField("Enter URL", text: $urlString, onCommit: {
+                        loadURL()
+                    })
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .frame(maxWidth: .infinity)
+                    .padding([.leading, .trailing], 8)
+
+                    Button(action: {
+                        reloadPage()
+                    }) {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                    .padding(.trailing, 8)
+
+                    Button(action: {
+                        setHomePage()
+                    }) {
+                        Image(systemName: "star")
+                    }
+                    .padding(.trailing, 8)
                 }
-                .padding(.trailing, 8)
+                .frame(height: 40)
+                .padding([.top, .leading, .trailing])
+
+                WebView(webView: webViewStore.webView)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(height: 40)
-            .padding([.top, .leading, .trailing])
+            .onAppear {
+                loadURL(urlString: homePage)
+            }
 
-            WebView(webView: webViewStore.webView)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-        .onAppear {
-            loadURL()
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    ResizableHandle()
+                        .frame(width: 20, height: 20)
+                        .background(Color.clear)
+                        .padding(5)
+                }
+            }
         }
     }
 
-    func loadURL() {
-        if let url = URL(string: urlString) {
+    func loadURL(urlString: String? = nil) {
+        if let urlString = urlString, let url = URL(string: urlString) {
+            webViewStore.loadUrl(url)
+        } else if let url = URL(string: self.urlString) {
             webViewStore.loadUrl(url)
         }
     }
@@ -61,6 +91,14 @@ struct ContentView: View {
         if webViewStore.webView.canGoBack {
             webViewStore.webView.goBack()
         }
+    }
+
+    func goHome() {
+        loadURL(urlString: homePage)
+    }
+
+    func setHomePage() {
+        homePage = webViewStore.webView.url?.absoluteString ?? homePage
     }
 }
 

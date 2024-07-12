@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct swiftsurf: App {
+struct swiftsurfApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
