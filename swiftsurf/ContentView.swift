@@ -9,69 +9,42 @@ import SwiftUI
 import WebKit
 
 struct ContentView: View {
-    @State private var urlString: String = "https://www.google.it"
+    @State private var urlString: String = "https://www.google.com/"
     @StateObject private var webViewStore = WebViewStore()
-    @AppStorage("homePage") private var homePage: String = "https://www.google.it"
+    @AppStorage("homePage") private var homePage: String = "https://www.google.com/"
 
     var body: some View {
-        ZStack {
-            VStack {
-                HStack {
-                    Button(action: {
-                        goBack()
-                    }) {
-                        Image(systemName: "arrow.left")
-                    }
-                    .padding(.leading, 8)
-
-                    Button(action: {
-                        goHome()
-                    }) {
-                        Image(systemName: "house")
-                    }
-                    .padding(.leading, 8)
-
-                    TextField("Enter URL", text: $urlString, onCommit: {
-                        loadURL()
-                    })
+        VStack(spacing: 0) {
+            HStack {
+                Button(action: { goBack() }) {
+                    Image(systemName: "chevron.left")
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                TextField("URL", text: $urlString, onCommit: { loadURL() })
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .frame(maxWidth: .infinity)
-                    .padding([.leading, .trailing], 8)
-
-                    Button(action: {
-                        reloadPage()
-                    }) {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                    .padding(.trailing, 8)
-
-                    Button(action: {
-                        setHomePage()
-                    }) {
-                        Image(systemName: "star")
-                    }
-                    .padding(.trailing, 8)
+                
+                Button(action: { reloadPage() }) {
+                    Image(systemName: "arrow.clockwise")
                 }
-                .frame(height: 40)
-                .padding([.top, .leading, .trailing])
-
-                WebView(webView: webViewStore.webView)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .buttonStyle(PlainButtonStyle())
             }
-            .onAppear {
-                loadURL(urlString: homePage)
-            }
+            .padding(.horizontal, 8)
+            .padding(.top, 8)
 
-            VStack {
+            WebViewController(webView: webViewStore.webView)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            HStack {
                 Spacer()
-                HStack {
-                    Spacer()
-                    ResizableHandle()
-                        .frame(width: 20, height: 20)
-                        .background(Color.clear)
-                        .padding(5)
-                }
+                Image(systemName: "arrow.up.left.and.arrow.down.right")
+                    .foregroundColor(.gray)
+                    .padding(5)
             }
+        }
+        .frame(minWidth: 320, minHeight: 400)
+        .onAppear {
+            loadURL(urlString: homePage)
         }
     }
 
@@ -102,15 +75,16 @@ struct ContentView: View {
     }
 }
 
-struct WebView: NSViewRepresentable {
+struct WebViewController: NSViewControllerRepresentable {
     let webView: WKWebView
 
-    func makeNSView(context: Context) -> WKWebView {
-        webView.autoresizingMask = [.width, .height]
-        return webView
+    func makeNSViewController(context: Context) -> NSViewController {
+        let viewController = NSViewController()
+        viewController.view = webView
+        return viewController
     }
 
-    func updateNSView(_ nsView: WKWebView, context: Context) {}
+    func updateNSViewController(_ nsViewController: NSViewController, context: Context) {}
 }
 
 class WebViewStore: ObservableObject {
@@ -118,18 +92,16 @@ class WebViewStore: ObservableObject {
 
     init() {
         let config = WKWebViewConfiguration()
+        config.defaultWebpagePreferences.allowsContentJavaScript = true
+        
         self.webView = WKWebView(frame: .zero, configuration: config)
         self.webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15"
         self.webView.configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+        
+        self.webView.autoresizingMask = [.width, .height]
     }
 
     func loadUrl(_ url: URL) {
         webView.load(URLRequest(url: url))
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
     }
 }
