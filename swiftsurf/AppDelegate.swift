@@ -10,8 +10,7 @@ import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusBarItem: NSStatusItem?
-    var popover: NSPopover?
-    var settingsWindow: NSWindow?
+    var popover: ResizablePopover?
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -21,49 +20,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             button.action = #selector(togglePopover)
         }
 
+        setupPopover()
+    }
+
+    func setupPopover() {
         let contentView = ContentView()
-        let resizableController = ResizablePopoverViewController(rootView: contentView, initialSize: NSSize(width: 320, height: 480))
+        let hostingController = NSHostingController(rootView: contentView)
         
-        popover = NSPopover()
-        popover?.contentViewController = resizableController
-        popover?.behavior = .applicationDefined
-        popover?.animates = true
+        popover = ResizablePopover()
+        popover?.contentViewController = hostingController
+        popover?.behavior = .transient
         popover?.contentSize = NSSize(width: 320, height: 480)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(popoverWillShow), name: NSPopover.willShowNotification, object: popover)
     }
 
     @objc func togglePopover() {
-        guard let popover = popover, let statusBarButton = statusBarItem?.button else { return }
-
-        if popover.isShown {
-            popover.performClose(nil)
-        } else {
-            popover.show(relativeTo: statusBarButton.bounds, of: statusBarButton, preferredEdge: .minY)
-            NSApp.activate(ignoringOtherApps: true)
+        if let button = statusBarItem?.button {
+            if popover?.isShown == true {
+                popover?.performClose(nil)
+            } else {
+                popover?.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            }
         }
-    }
-
-    @objc func popoverWillShow(_ notification: Notification) {
-        if let popover = notification.object as? NSPopover {
-            popover.contentSize = NSSize(width: 320, height: 480)
-        }
-    }
-
-    @objc func openSettings(_ sender: AnyObject?) {
-        if settingsWindow == nil {
-            let settingsView = SettingsView()
-            settingsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 300, height: 200),
-                styleMask: [.titled, .closable, .miniaturizable, .resizable],
-                backing: .buffered,
-                defer: false
-            )
-            settingsWindow?.title = "Settings"
-            settingsWindow?.isReleasedWhenClosed = false
-            settingsWindow?.contentView = NSHostingView(rootView: settingsView)
-        }
-        settingsWindow?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
     }
 }

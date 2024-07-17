@@ -34,13 +34,6 @@ struct ContentView: View {
 
             WebViewController(webView: webViewStore.webView)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            HStack {
-                Spacer()
-                Image(systemName: "arrow.up.left.and.arrow.down.right")
-                    .foregroundColor(.gray)
-                    .padding(5)
-            }
         }
         .frame(minWidth: 320, minHeight: 400)
         .onAppear {
