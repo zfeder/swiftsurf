@@ -2,28 +2,26 @@
 //  SettingsView.swift
 //  swiftsurf
 //
-//  Created by Federico Filì on 12/07/24.
-//
 
 import SwiftUI
 
 struct SettingsView: View {
-    @AppStorage("homePage") private var homePage: String = "https://www.google.com/"
+    @AppStorage("homePage") private var homePage = "https://www.google.com/"
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Settings")
-                .font(.headline)
-            
-            HStack {
-                Text("Home Page:")
-                TextField("Home Page", text: $homePage)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+        Form {
+            Section {
+                TextField("Home page URL", text: $homePage)
+                    .textFieldStyle(.roundedBorder)
+            } header: {
+                Label("Startup", systemImage: "house")
+            } footer: {
+                Text("This page opens whenever SwiftSurf starts a new session.")
+                    .foregroundStyle(.secondary)
             }
-
-            Spacer()
         }
+        .formStyle(.grouped)
         .padding()
-        .frame(width: 300, height: 200)
+        .frame(width: 380, height: 170)
     }
 }

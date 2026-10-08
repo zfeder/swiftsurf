@@ -1,78 +1,76 @@
 //
-//  ResizablePopoverViewController.swift
+//  ResizablePopover.swift
 //  swiftsurf
-//
-//  Created by Federico Filì on 13/07/24.
 //
 
 import Cocoa
 import SwiftUI
 
-class ResizablePopover: NSPopover {
-    private var resizeHandle: NSView?
-    private var isResizing = false
-    
+final class ResizablePopover: NSPopover {
+    static weak var activePopover: ResizablePopover?
+    static let minimumContentSize = NSSize(width: 420, height: 480)
+    static let maximumContentSize = NSSize(width: 1_200, height: 1_000)
+
+    override var contentSize: NSSize {
+        get { super.contentSize }
+        set {
+            super.contentSize = NSSize(
+                width: min(max(newValue.width, Self.minimumContentSize.width), Self.maximumContentSize.width),
+                height: min(max(newValue.height, Self.minimumContentSize.height), Self.maximumContentSize.height)
+            )
+        }
+    }
+
     override func show(relativeTo positioningRect: NSRect, of positioningView: NSView, preferredEdge: NSRectEdge) {
+        Self.activePopover = self
         super.show(relativeTo: positioningRect, of: positioningView, preferredEdge: preferredEdge)
-        
-        DispatchQueue.main.async {
-            self.addResizeHandle()
+    }
+
+    override func performClose(_ sender: Any?) {
+        super.performClose(sender)
+        if Self.activePopover === self {
+            Self.activePopover = nil
         }
     }
-    
-    private func addResizeHandle() {
-        guard let frameView = contentViewController?.view.window?.contentView?.superview,
-              resizeHandle == nil else { return }
-        
-        let handle = NSView(frame: NSRect(x: frameView.bounds.width - 20, y: 0, width: 20, height: 20))
-        handle.wantsLayer = true
-        handle.layer?.backgroundColor = NSColor.clear.cgColor
-        
-        frameView.addSubview(handle)
-        
-        let panGesture = NSPanGestureRecognizer(target: self, action: #selector(handleResize(_:)))
-        handle.addGestureRecognizer(panGesture)
-        
-        self.resizeHandle = handle
-        
-        updateResizeHandlePosition()
+}
+
+struct ResizeHandle: NSViewRepresentable {
+    func makeNSView(context: Context) -> ResizeHandleView {
+        ResizeHandleView()
     }
-    
-    private func updateResizeHandlePosition() {
-        guard let frameView = contentViewController?.view.window?.contentView?.superview,
-              let handle = resizeHandle else { return }
-        
-        handle.frame.origin = CGPoint(x: frameView.bounds.width - 20, y: 0)
+
+    func updateNSView(_ nsView: ResizeHandleView, context: Context) {}
+}
+
+final class ResizeHandleView: NSView {
+    private var initialMouseLocation: NSPoint = .zero
+    private var initialContentSize: NSSize = .zero
+
+    override var mouseDownCanMoveWindow: Bool { false }
+
+    override func resetCursorRects() {
+        addCursorRect(bounds, cursor: .resizeUpDown)
     }
-    
-    @objc func handleResize(_ gesture: NSPanGestureRecognizer) {
-        guard let frameView = contentViewController?.view.window?.contentView?.superview,
-              let contentView = contentViewController?.view else { return }
-        
-        switch gesture.state {
-        case .began:
-            isResizing = true
-        case .changed:
-            guard isResizing else { return }
-            
-            let translation = gesture.translation(in: frameView)
-            var newSize = contentView.frame.size
-            newSize.width += translation.x
-            newSize.height -= translation.y
-            
-            newSize.width = max(newSize.width, 320)  // Minimum width
-            newSize.height = max(newSize.height, 400)  // Minimum height
-            
-            contentSize = newSize
-            contentViewController?.view.frame.size = newSize
-            
-            updateResizeHandlePosition()
-            
-            gesture.setTranslation(.zero, in: frameView)
-        case .ended, .cancelled:
-            isResizing = false
-        default:
-            break
-        }
+
+    override func mouseDown(with event: NSEvent) {
+        guard let popover = ResizablePopover.activePopover else { return }
+        initialMouseLocation = event.locationInWindow
+        initialContentSize = popover.contentSize
     }
+
+    override func mouseDragged(with event: NSEvent) {
+        guard let popover = ResizablePopover.activePopover else { return }
+
+        let location = event.locationInWindow
+        let delta = NSPoint(
+            x: location.x - initialMouseLocation.x,
+            y: location.y - initialMouseLocation.y
+        )
+
+        popover.contentSize = NSSize(
+            width: initialContentSize.width + delta.x,
+            height: initialContentSize.height - delta.y
+        )
+    }
+
 }
