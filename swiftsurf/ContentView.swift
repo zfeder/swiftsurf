@@ -17,6 +17,7 @@ struct ContentView: View {
             header
 
             WebViewController(webView: browser.webView)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .padding(.horizontal, 12)
                 .padding(.bottom, 10)
@@ -152,7 +153,15 @@ private struct CircleIconButton: View {
 struct WebViewController: NSViewRepresentable {
     let webView: WKWebView
 
-    func makeNSView(context: Context) -> WKWebView { webView }
+    func makeNSView(context: Context) -> WKWebView {
+        webView.autoresizingMask = [.width, .height]
+        webView.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        webView.setContentHuggingPriority(.defaultLow, for: .vertical)
+        webView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        webView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        return webView
+    }
+
     func updateNSView(_ nsView: WKWebView, context: Context) {}
 }
 
