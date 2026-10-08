@@ -4,5 +4,11 @@
 <dict>
 	<key>LSUIElement</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>SwiftSurf lets websites use the camera when you approve access.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>SwiftSurf lets websites use the microphone when you approve access.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>SwiftSurf lets websites use your location when you approve access.</string>
 </dict>
 </plist>

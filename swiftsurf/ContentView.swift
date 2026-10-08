@@ -4,150 +4,146 @@
 //
 
 import Combine
+import Cocoa
 import SwiftUI
 import WebKit
 
-struct ContentView: View {
-    @StateObject private var browser = WebViewStore()
-    @AppStorage("homePage") private var homePage = "https://www.google.com/"
-    @State private var address = ""
+struct Bookmark: Codable, Identifiable, Equatable {
+    let id: UUID
+    var title: String
+    var url: String
 
-    var body: some View {
-        VStack(spacing: 0) {
-            header
+    init(title: String, url: String) {
+        id = UUID()
+        self.title = title
+        self.url = url
+    }
+}
 
-            WebViewController(webView: browser.webView)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .padding(.horizontal, 12)
-                .padding(.bottom, 10)
-                .overlay(alignment: .bottomTrailing) {
-                    ResizeHandle()
-                        .frame(width: 28, height: 28)
-                        .padding(.trailing, 8)
-                        .padding(.bottom, 6)
-                }
-                .overlay {
-                    if let error = browser.navigationError {
-                        NavigationErrorView(message: error) {
-                            browser.reload()
-                        }
-                    }
-                }
+struct HistoryEntry: Codable, Identifiable {
+    let id: UUID
+    let title: String
+    let url: String
+    let visitedAt: Date
+}
+
+@MainActor
+final class BrowserSession: ObservableObject {
+    @Published var tabs: [BrowserTab] = []
+    @Published var selectedTabID: UUID?
+    @Published var bookmarks: [Bookmark] = []
+    @Published var history: [HistoryEntry] = []
+    @Published var privateMode = false
+
+    private let bookmarksKey = "bookmarks"
+    private let historyKey = "history"
+
+    init() {
+        bookmarks = load([Bookmark].self, key: bookmarksKey) ?? []
+        history = load([HistoryEntry].self, key: historyKey) ?? []
+        addTab()
+    }
+
+    var selectedTab: BrowserTab? {
+        tabs.first { $0.id == selectedTabID }
+    }
+
+    func addTab(url: String? = nil) {
+        let tab = BrowserTab(isPrivate: privateMode)
+        tabs.append(tab)
+        selectedTabID = tab.id
+        if let url {
+            tab.load(url)
         }
-        .frame(minWidth: ResizablePopover.minimumContentSize.width,
-               idealWidth: 680,
-               minHeight: ResizablePopover.minimumContentSize.height,
-               idealHeight: 720)
-        .background(.regularMaterial)
-        .onAppear {
-            guard address.isEmpty else { return }
-            address = homePage
-            loadAddress()
-        }
-        .onReceive(browser.$currentURL) { url in
-            if let url, url.absoluteString != address {
-                address = url.absoluteString
+    }
+
+    func close(_ tab: BrowserTab) {
+        guard tabs.count > 1 else { return }
+        if let index = tabs.firstIndex(where: { $0.id == tab.id }) {
+            tabs.remove(at: index)
+            if selectedTabID == tab.id {
+                selectedTabID = tabs[min(index, tabs.count - 1)].id
             }
         }
     }
 
-    private struct NavigationErrorView: View {
-        let message: String
-        let retry: () -> Void
+    func record(_ tab: BrowserTab) {
+        guard !tab.isPrivate, let url = tab.url?.absoluteString else { return }
+        history.removeAll { $0.url == url }
+        history.insert(HistoryEntry(id: UUID(), title: tab.title, url: url, visitedAt: Date()), at: 0)
+        history = Array(history.prefix(50))
+        save(history, key: historyKey)
+    }
 
-        var body: some View {
-            VStack(spacing: 10) {
-                Image(systemName: "wifi.exclamationmark")
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
-                Text("Unable to load this page")
-                    .font(.headline)
-                Text(message)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(3)
-                Button("Try Again", action: retry)
-                    .buttonStyle(.borderedProminent)
-            }
-            .padding(24)
-            .frame(maxWidth: 320)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
-            .shadow(radius: 12, y: 4)
+    func toggleBookmark(for tab: BrowserTab) {
+        guard let url = tab.url?.absoluteString else { return }
+        if let index = bookmarks.firstIndex(where: { $0.url == url }) {
+            bookmarks.remove(at: index)
+        } else {
+            bookmarks.insert(Bookmark(title: tab.title.isEmpty ? url : tab.title, url: url), at: 0)
+        }
+        save(bookmarks, key: bookmarksKey)
+    }
+
+    func isBookmarked(_ tab: BrowserTab) -> Bool {
+        guard let url = tab.url?.absoluteString else { return false }
+        return bookmarks.contains { $0.url == url }
+    }
+
+    func clearBrowsingData() {
+        WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+                                                  modifiedSince: .distantPast) {}
+        history.removeAll()
+        save(history, key: historyKey)
+    }
+
+    func setPrivateMode(_ enabled: Bool) {
+        privateMode = enabled
+        if enabled {
+            addTab()
         }
     }
 
-    private var header: some View {
-        VStack(spacing: 10) {
-            HStack(spacing: 8) {
-                CircleIconButton(systemName: "chevron.left",
-                                 isEnabled: browser.canGoBack) {
-                    browser.webView.goBack()
-                }
-                CircleIconButton(systemName: "chevron.right",
-                                 isEnabled: browser.canGoForward) {
-                    browser.webView.goForward()
-                }
-
-                HStack(spacing: 8) {
-                    Image(systemName: "lock.fill")
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(.secondary)
-
-                    TextField("Search or enter website address", text: $address) {
-                        loadAddress()
-                    }
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 13))
-                    .onSubmit(loadAddress)
-
-                    if browser.isLoading {
-                        ProgressView()
-                            .controlSize(.small)
-                    } else {
-                        Image(systemName: "magnifyingglass")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .padding(.horizontal, 11)
-                .padding(.vertical, 8)
-                .background(Color.primary.opacity(0.07))
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-
-                CircleIconButton(systemName: browser.isLoading ? "xmark" : "arrow.clockwise") {
-                    if browser.isLoading {
-                        browser.webView.stopLoading()
-                    } else {
-                        browser.webView.reload()
-                    }
-                }
-            }
-
-            HStack(spacing: 16) {
-                Label("SwiftSurf", systemImage: "globe")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-
-                Text(browser.pageTitle.isEmpty ? "Ready to browse" : browser.pageTitle)
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .lineLimit(1)
-            }
-        }
-        .padding(.horizontal, 12)
-        .padding(.top, 12)
-        .padding(.bottom, 10)
-        .background(.regularMaterial)
+    private func save<T: Encodable>(_ value: T, key: String) {
+        guard let data = try? JSONEncoder().encode(value) else { return }
+        UserDefaults.standard.set(data, forKey: key)
     }
 
-    private func loadAddress() {
+    private func load<T: Decodable>(_ type: T.Type, key: String) -> T? {
+        guard let data = UserDefaults.standard.data(forKey: key) else { return nil }
+        return try? JSONDecoder().decode(type, from: data)
+    }
+}
+
+final class BrowserTab: ObservableObject, Identifiable {
+    let id = UUID()
+    let isPrivate: Bool
+    let webView: WKWebView
+    private var navigationDelegate: BrowserNavigationDelegate!
+    @Published var url: URL?
+    @Published var title = "New Tab"
+    @Published var isLoading = false
+    @Published var error: String?
+
+    init(isPrivate: Bool) {
+        self.isPrivate = isPrivate
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = isPrivate ? .nonPersistent() : .default()
+        configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+        configuration.applicationNameForUserAgent = "SwiftSurf/1.0"
+        configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
+        webView = WKWebView(frame: .zero, configuration: configuration)
+        let delegate = BrowserNavigationDelegate(tab: nil)
+        navigationDelegate = delegate
+        delegate.tab = self
+        webView.navigationDelegate = delegate
+        webView.uiDelegate = delegate
+        webView.allowsMagnification = true
+    }
+
+    func load(_ address: String) {
         let trimmed = address.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
-
         let destination: String
         if trimmed.contains("://") {
             destination = trimmed
@@ -157,10 +153,322 @@ struct ContentView: View {
             let query = trimmed.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? trimmed
             destination = "https://www.google.com/search?q=" + query
         }
-
         guard let url = URL(string: destination) else { return }
-        address = destination
-        browser.webView.load(URLRequest(url: url))
+        webView.load(URLRequest(url: url))
+    }
+}
+
+private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate, WKUIDelegate, WKDownloadDelegate {
+    weak var tab: BrowserTab?
+
+    init(tab: BrowserTab?) {
+        self.tab = tab
+    }
+
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        tab?.error = nil
+        tab?.isLoading = true
+    }
+
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        update(webView)
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        update(webView)
+        tab?.isLoading = false
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        fail(error)
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        fail(error)
+    }
+
+    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
+                 for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        guard navigationAction.targetFrame == nil else { return nil }
+        webView.load(navigationAction.request)
+        return nil
+    }
+
+    func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,
+                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        if !navigationResponse.canShowMIMEType {
+            decisionHandler(.download)
+        } else {
+            decisionHandler(.allow)
+        }
+    }
+
+    func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse,
+                 didBecome download: WKDownload) {
+        download.delegate = self
+    }
+
+    func download(_ download: WKDownload, decideDestinationUsing response: URLResponse,
+                  suggestedFilename: String, completionHandler: @escaping (URL?) -> Void) {
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = suggestedFilename
+        panel.canCreateDirectories = true
+        panel.directoryURL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
+        completionHandler(panel.runModal() == .OK ? panel.url : nil)
+    }
+
+    func downloadDidFinish(_ download: WKDownload) {
+        NSSound.beep()
+    }
+
+    func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
+        NSLog("SwiftSurf download error: %@", error.localizedDescription)
+    }
+
+    private func update(_ webView: WKWebView) {
+        tab?.url = webView.url
+        tab?.title = webView.title?.isEmpty == false ? webView.title! : (webView.url?.host ?? "New Tab")
+        tab?.isLoading = webView.isLoading
+    }
+
+    private func fail(_ error: Error) {
+        tab?.error = error.localizedDescription
+        tab?.isLoading = false
+    }
+}
+
+struct ContentView: View {
+    @StateObject private var session = BrowserSession()
+    @AppStorage("homePage") private var homePage = "https://www.google.com/"
+    @State private var address = ""
+    @State private var showingHistory = false
+    @FocusState private var addressIsFocused: Bool
+
+    private var tab: BrowserTab? { session.selectedTab }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            tabBar
+            toolbar
+
+            if let tab {
+                WebViewController(webView: tab.webView)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 10)
+                    .overlay(alignment: .bottomTrailing) {
+                        ResizeHandle()
+                            .frame(width: 28, height: 28)
+                            .padding(.trailing, 8)
+                            .padding(.bottom, 6)
+                    }
+                    .overlay {
+                        if let error = tab.error {
+                            NavigationErrorView(message: error) {
+                                tab.webView.reload()
+                            }
+                        }
+                    }
+            }
+        }
+        .frame(minWidth: ResizablePopover.minimumContentSize.width,
+               idealWidth: 680,
+               minHeight: ResizablePopover.minimumContentSize.height,
+               idealHeight: 720)
+        .background(.regularMaterial)
+        .onAppear {
+            if let tab, tab.url == nil {
+                tab.load(homePage)
+            }
+            syncAddress()
+        }
+        .onChange(of: tab?.url) { _, _ in syncAddress() }
+        .sheet(isPresented: $showingHistory) {
+            HistoryView(entries: session.history) { entry in
+                tab?.load(entry.url)
+                showingHistory = false
+            }
+        }
+        .background {
+            HStack(spacing: 0) {
+                Button("") { tab?.webView.reload() }
+                    .keyboardShortcut("r", modifiers: .command)
+                Button("") { if let tab { session.close(tab) } }
+                    .keyboardShortcut("w", modifiers: .command)
+            }
+            .frame(width: 0, height: 0)
+            .opacity(0)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .swiftSurfShowHistory)) { _ in
+            showingHistory = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .swiftSurfNewTab)) { _ in
+            session.addTab()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .swiftSurfFocusAddress)) { _ in
+            addressIsFocused = true
+        }
+    }
+
+    private var tabBar: some View {
+        HStack(spacing: 5) {
+            ForEach(session.tabs) { item in
+                Button {
+                    session.selectedTabID = item.id
+                    syncAddress()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: item.isPrivate ? "eye.slash" : "globe")
+                        Text(item.title)
+                            .lineLimit(1)
+                        if session.tabs.count > 1 {
+                            Button {
+                                session.close(item)
+                            } label: {
+                                Image(systemName: "xmark")
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .font(.caption)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 6)
+                    .background(session.selectedTabID == item.id ? Color.primary.opacity(0.1) : .clear)
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+                }
+                .buttonStyle(.plain)
+            }
+
+            Button { session.addTab() } label: {
+                Image(systemName: "plus")
+                    .frame(width: 24, height: 24)
+            }
+            .buttonStyle(.plain)
+            .keyboardShortcut("t", modifiers: .command)
+
+            Spacer()
+            if session.privateMode {
+                Label("Private", systemImage: "eye.slash")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.purple)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.top, 8)
+    }
+
+    private var toolbar: some View {
+        HStack(spacing: 8) {
+            CircleIconButton(systemName: "chevron.left", isEnabled: tab?.webView.canGoBack == true) {
+                tab?.webView.goBack()
+            }
+            CircleIconButton(systemName: "chevron.right", isEnabled: tab?.webView.canGoForward == true) {
+                tab?.webView.goForward()
+            }
+
+            HStack(spacing: 8) {
+                Image(systemName: tab?.url?.scheme == "https" ? "lock.fill" : "globe")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.secondary)
+                TextField("Search or enter website address", text: $address) {
+                    tab?.load(address)
+                }
+                .textFieldStyle(.plain)
+                .font(.system(size: 13))
+                .focused($addressIsFocused)
+                .onSubmit { tab?.load(address) }
+                if tab?.isLoading == true {
+                    ProgressView().controlSize(.small)
+                } else {
+                    Image(systemName: "magnifyingglass").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            .padding(.horizontal, 11)
+            .padding(.vertical, 8)
+            .background(Color.primary.opacity(0.07))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            CircleIconButton(systemName: "arrow.clockwise") { tab?.webView.reload() }
+            Menu {
+                Button(tab.map(session.isBookmarked) == true ? "Remove Bookmark" : "Add Bookmark") {
+                    if let tab { session.toggleBookmark(for: tab) }
+                }
+                Menu("Bookmarks") {
+                    ForEach(session.bookmarks) { bookmark in
+                        Button(bookmark.title) { tab?.load(bookmark.url) }
+                    }
+                }
+                Menu("Recent") {
+                    ForEach(session.history.prefix(10)) { entry in
+                        Button(entry.title) { tab?.load(entry.url) }
+                    }
+                    Button("Show history") {
+                        showingHistory = true
+                    }
+                }
+                Divider()
+                Toggle("Private browsing", isOn: Binding(get: { session.privateMode }, set: session.setPrivateMode))
+                Button("Clear browsing data", role: .destructive) { session.clearBrowsingData() }
+                Button("Show downloads") {
+                    NSWorkspace.shared.open(FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0])
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.title3)
+            }
+            .menuStyle(.borderlessButton)
+            .frame(width: 28)
+        }
+        .padding(.horizontal, 12)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
+        .background(.regularMaterial)
+    }
+
+    private func syncAddress() {
+        address = tab?.url?.absoluteString ?? ""
+    }
+}
+
+private struct NavigationErrorView: View {
+    let message: String
+    let retry: () -> Void
+    var body: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "wifi.exclamationmark").font(.title2).foregroundStyle(.secondary)
+            Text("Unable to load this page").font(.headline)
+            Text(message).font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center).lineLimit(3)
+            Button("Try Again", action: retry).buttonStyle(.borderedProminent)
+        }
+        .padding(24)
+        .frame(maxWidth: 320)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .shadow(radius: 12, y: 4)
+    }
+}
+
+private struct HistoryView: View {
+    let entries: [HistoryEntry]
+    let select: (HistoryEntry) -> Void
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Recent pages").font(.title2.weight(.semibold))
+            if entries.isEmpty {
+                Text("No recent pages").foregroundStyle(.secondary)
+            } else {
+                List(entries) { entry in
+                    Button { select(entry) } label: {
+                        VStack(alignment: .leading) {
+                            Text(entry.title).font(.headline)
+                            Text(entry.url).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                        }
+                    }.buttonStyle(.plain)
+                }
+            }
+        }
+        .padding()
+        .frame(width: 460, height: 360)
     }
 }
 
@@ -168,11 +476,9 @@ private struct CircleIconButton: View {
     let systemName: String
     var isEnabled = true
     let action: () -> Void
-
     var body: some View {
         Button(action: action) {
-            Image(systemName: systemName)
-                .font(.system(size: 12, weight: .semibold))
+            Image(systemName: systemName).font(.system(size: 12, weight: .semibold))
                 .frame(width: 28, height: 28)
                 .background(Color.primary.opacity(isEnabled ? 0.08 : 0.03))
                 .clipShape(Circle())
@@ -185,7 +491,6 @@ private struct CircleIconButton: View {
 
 struct WebViewController: NSViewRepresentable {
     let webView: WKWebView
-
     func makeNSView(context: Context) -> WKWebView {
         webView.autoresizingMask = [.width, .height]
         webView.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -194,76 +499,5 @@ struct WebViewController: NSViewRepresentable {
         webView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         return webView
     }
-
     func updateNSView(_ nsView: WKWebView, context: Context) {}
-}
-
-final class WebViewStore: NSObject, ObservableObject, WKNavigationDelegate, WKUIDelegate {
-    let webView: WKWebView
-    @Published var currentURL: URL?
-    @Published var pageTitle = ""
-    @Published var canGoBack = false
-    @Published var canGoForward = false
-    @Published var isLoading = false
-    @Published var navigationError: String?
-
-    override init() {
-        let configuration = WKWebViewConfiguration()
-        configuration.websiteDataStore = .default()
-        configuration.defaultWebpagePreferences.allowsContentJavaScript = true
-        configuration.applicationNameForUserAgent = "SwiftSurf/1.0"
-        configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
-        webView = WKWebView(frame: .zero, configuration: configuration)
-        super.init()
-        webView.navigationDelegate = self
-        webView.uiDelegate = self
-        webView.allowsMagnification = true
-    }
-
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        navigationError = nil
-        updateState()
-    }
-
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        updateState()
-    }
-
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        updateState()
-    }
-
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        navigationError = error.localizedDescription
-        updateState()
-        NSLog("SwiftSurf navigation error: %@", error.localizedDescription)
-    }
-
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        navigationError = error.localizedDescription
-        updateState()
-        NSLog("SwiftSurf provisional navigation error: %@", error.localizedDescription)
-    }
-
-    func webView(_ webView: WKWebView,
-                 createWebViewWith configuration: WKWebViewConfiguration,
-                 for navigationAction: WKNavigationAction,
-                 windowFeatures: WKWindowFeatures) -> WKWebView? {
-        guard navigationAction.targetFrame == nil else { return nil }
-        webView.load(navigationAction.request)
-        return nil
-    }
-
-    func reload() {
-        navigationError = nil
-        webView.reload()
-    }
-
-    private func updateState() {
-        currentURL = webView.url
-        pageTitle = webView.title ?? ""
-        canGoBack = webView.canGoBack
-        canGoForward = webView.canGoForward
-        isLoading = webView.isLoading
-    }
 }
