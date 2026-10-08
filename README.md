@@ -11,6 +11,16 @@
 
 > **Download SwiftSurf:** [get the latest DMG from GitHub Releases](https://github.com/zfeder/swiftsurf/releases/latest)
 
+## Preview
+
+<p align="center">
+  <img src="assets/screenshots/swiftsurf-browser-preview.svg" alt="SwiftSurf browser preview" width="700">
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/swiftsurf-tabs-preview.svg" alt="SwiftSurf tabs preview" width="700">
+</p>
+
 ## Why SwiftSurf?
 
 SwiftSurf is a compact `WKWebView` browser that stays one click away in the
