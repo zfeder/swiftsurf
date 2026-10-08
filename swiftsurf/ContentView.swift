@@ -34,6 +34,7 @@ final class BrowserSession: ObservableObject {
     @Published var bookmarks: [Bookmark] = []
     @Published var history: [HistoryEntry] = []
     @Published var privateMode = false
+    @Published private(set) var navigationRevision = 0
 
     private let bookmarksKey = "bookmarks"
     private let historyKey = "history"
@@ -50,8 +51,13 @@ final class BrowserSession: ObservableObject {
 
     func addTab(url: String? = nil) {
         let tab = BrowserTab(isPrivate: privateMode)
+        tab.onStateChange = { [weak self, weak tab] in
+            guard let self, let tab, self.selectedTabID == tab.id else { return }
+            self.navigationRevision += 1
+        }
         tabs.append(tab)
         selectedTabID = tab.id
+        navigationRevision += 1
         if let url {
             tab.load(url)
         }
@@ -64,6 +70,7 @@ final class BrowserSession: ObservableObject {
             if selectedTabID == tab.id {
                 selectedTabID = tabs[min(index, tabs.count - 1)].id
             }
+            navigationRevision += 1
         }
     }
 
@@ -120,10 +127,13 @@ final class BrowserTab: ObservableObject, Identifiable {
     let isPrivate: Bool
     let webView: WKWebView
     private var navigationDelegate: BrowserNavigationDelegate!
+    var onStateChange: (() -> Void)?
     @Published var url: URL?
     @Published var title = "New Tab"
     @Published var isLoading = false
     @Published var error: String?
+    @Published var canGoBack = false
+    @Published var canGoForward = false
 
     init(isPrivate: Bool) {
         self.isPrivate = isPrivate
@@ -139,6 +149,9 @@ final class BrowserTab: ObservableObject, Identifiable {
         webView.navigationDelegate = delegate
         webView.uiDelegate = delegate
         webView.allowsMagnification = true
+        webView.allowsBackForwardNavigationGestures = true
+        webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) " +
+            "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15 SwiftSurf/1.0"
     }
 
     func load(_ address: String) {
@@ -156,6 +169,20 @@ final class BrowserTab: ObservableObject, Identifiable {
         guard let url = URL(string: destination) else { return }
         webView.load(URLRequest(url: url))
     }
+
+    func reload() {
+        error = nil
+        webView.reload()
+    }
+
+    func updateNavigationState() {
+        url = webView.url
+        title = webView.title?.isEmpty == false ? webView.title! : (webView.url?.host ?? "New Tab")
+        isLoading = webView.isLoading
+        canGoBack = webView.canGoBack
+        canGoForward = webView.canGoForward
+        onStateChange?()
+    }
 }
 
 private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate, WKUIDelegate, WKDownloadDelegate {
@@ -167,7 +194,7 @@ private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate, W
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         tab?.error = nil
-        tab?.isLoading = true
+        tab?.updateNavigationState()
     }
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
@@ -176,7 +203,6 @@ private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate, W
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         update(webView)
-        tab?.isLoading = false
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -226,14 +252,13 @@ private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate, W
     }
 
     private func update(_ webView: WKWebView) {
-        tab?.url = webView.url
-        tab?.title = webView.title?.isEmpty == false ? webView.title! : (webView.url?.host ?? "New Tab")
-        tab?.isLoading = webView.isLoading
+        tab?.updateNavigationState()
     }
 
     private func fail(_ error: Error) {
+        guard (error as NSError).code != NSURLErrorCancelled else { return }
         tab?.error = error.localizedDescription
-        tab?.isLoading = false
+        tab?.updateNavigationState()
     }
 }
 
@@ -254,6 +279,7 @@ struct ContentView: View {
             if let tab {
                 WebViewController(webView: tab.webView)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .layoutPriority(1)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .padding(.horizontal, 12)
                     .padding(.bottom, 10)
@@ -283,7 +309,7 @@ struct ContentView: View {
             }
             syncAddress()
         }
-        .onChange(of: tab?.url) { _, _ in syncAddress() }
+        .onReceive(session.$navigationRevision) { _ in syncAddress() }
         .sheet(isPresented: $showingHistory) {
             HistoryView(entries: session.history) { entry in
                 tab?.load(entry.url)
@@ -360,10 +386,10 @@ struct ContentView: View {
 
     private var toolbar: some View {
         HStack(spacing: 8) {
-            CircleIconButton(systemName: "chevron.left", isEnabled: tab?.webView.canGoBack == true) {
+            CircleIconButton(systemName: "chevron.left", isEnabled: tab?.canGoBack == true) {
                 tab?.webView.goBack()
             }
-            CircleIconButton(systemName: "chevron.right", isEnabled: tab?.webView.canGoForward == true) {
+            CircleIconButton(systemName: "chevron.right", isEnabled: tab?.canGoForward == true) {
                 tab?.webView.goForward()
             }
 
@@ -389,7 +415,7 @@ struct ContentView: View {
             .background(Color.primary.opacity(0.07))
             .clipShape(RoundedRectangle(cornerRadius: 10))
 
-            CircleIconButton(systemName: "arrow.clockwise") { tab?.webView.reload() }
+            CircleIconButton(systemName: "arrow.clockwise") { tab?.reload() }
             Menu {
                 Button(tab.map(session.isBookmarked) == true ? "Remove Bookmark" : "Add Bookmark") {
                     if let tab { session.toggleBookmark(for: tab) }
