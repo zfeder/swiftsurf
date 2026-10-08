@@ -1,0 +1,4 @@
+# Xcode and local build products
+DerivedData/
+dist/
+*.xcuserstate
