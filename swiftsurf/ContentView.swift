@@ -27,6 +27,13 @@ struct ContentView: View {
                         .padding(.trailing, 8)
                         .padding(.bottom, 6)
                 }
+                .overlay {
+                    if let error = browser.navigationError {
+                        NavigationErrorView(message: error) {
+                            browser.reload()
+                        }
+                    }
+                }
         }
         .frame(minWidth: ResizablePopover.minimumContentSize.width,
                idealWidth: 680,
@@ -42,6 +49,32 @@ struct ContentView: View {
             if let url, url.absoluteString != address {
                 address = url.absoluteString
             }
+        }
+    }
+
+    private struct NavigationErrorView: View {
+        let message: String
+        let retry: () -> Void
+
+        var body: some View {
+            VStack(spacing: 10) {
+                Image(systemName: "wifi.exclamationmark")
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+                Text("Unable to load this page")
+                    .font(.headline)
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
+                Button("Try Again", action: retry)
+                    .buttonStyle(.borderedProminent)
+            }
+            .padding(24)
+            .frame(maxWidth: 320)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+            .shadow(radius: 12, y: 4)
         }
     }
 
@@ -165,22 +198,30 @@ struct WebViewController: NSViewRepresentable {
     func updateNSView(_ nsView: WKWebView, context: Context) {}
 }
 
-final class WebViewStore: NSObject, ObservableObject, WKNavigationDelegate {
+final class WebViewStore: NSObject, ObservableObject, WKNavigationDelegate, WKUIDelegate {
     let webView: WKWebView
     @Published var currentURL: URL?
     @Published var pageTitle = ""
     @Published var canGoBack = false
     @Published var canGoForward = false
     @Published var isLoading = false
+    @Published var navigationError: String?
 
     override init() {
-        webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .default()
+        configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+        configuration.applicationNameForUserAgent = "SwiftSurf/1.0"
+        configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
+        webView = WKWebView(frame: .zero, configuration: configuration)
         super.init()
         webView.navigationDelegate = self
+        webView.uiDelegate = self
         webView.allowsMagnification = true
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        navigationError = nil
         updateState()
     }
 
@@ -193,13 +234,29 @@ final class WebViewStore: NSObject, ObservableObject, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        navigationError = error.localizedDescription
         updateState()
         NSLog("SwiftSurf navigation error: %@", error.localizedDescription)
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        navigationError = error.localizedDescription
         updateState()
         NSLog("SwiftSurf provisional navigation error: %@", error.localizedDescription)
+    }
+
+    func webView(_ webView: WKWebView,
+                 createWebViewWith configuration: WKWebViewConfiguration,
+                 for navigationAction: WKNavigationAction,
+                 windowFeatures: WKWindowFeatures) -> WKWebView? {
+        guard navigationAction.targetFrame == nil else { return nil }
+        webView.load(navigationAction.request)
+        return nil
+    }
+
+    func reload() {
+        navigationError = nil
+        webView.reload()
     }
 
     private func updateState() {

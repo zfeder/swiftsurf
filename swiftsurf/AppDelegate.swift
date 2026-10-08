@@ -25,7 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         popover.contentViewController = NSHostingController(rootView: ContentView())
         popover.behavior = .transient
         popover.animates = true
-        popover.contentSize = NSSize(width: 680, height: 720)
+        popover.contentSize = ResizablePopover.savedContentSize
         browserPopover = popover
     }
 
