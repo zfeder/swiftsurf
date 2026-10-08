@@ -31,9 +31,14 @@ expect from a desktop browser, while keeping its footprint deliberately small.
 
 ### Packaged app
 
-Download `SwiftSurf.dmg`, open it, and drag **SwiftSurf** into the
-**Applications** folder. On first launch, macOS may ask you to confirm that
-you want to open an app downloaded from the internet.
+Download the latest **[SwiftSurf.dmg from GitHub Releases](https://github.com/zfeder/swiftsurf/releases/latest)**,
+open it, and drag **SwiftSurf** into the **Applications** folder. On first
+launch, macOS may ask you to confirm that you want to open an app downloaded
+from the internet.
+
+The installer is generated automatically by GitHub Actions whenever a version
+tag such as `v1.0.0` is pushed. You do not need Xcode to install a published
+release.
 
 ### Build from source
 
@@ -65,6 +70,19 @@ The repository includes a repeatable packaging script:
 
 It creates `dist/SwiftSurf.dmg`, containing the app and an Applications
 shortcut for drag-and-drop installation.
+
+## Publishing a release
+
+Create and push a version tag:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+GitHub Actions builds the Release configuration on a macOS runner and attaches
+`SwiftSurf.dmg` to a GitHub Release. The latest installer is always available
+at the Releases page above.
 
 ## Keyboard shortcuts
 
