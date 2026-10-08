@@ -11,6 +11,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var browserPopover: ResizablePopover?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        if let iconURL = Bundle.main.url(forResource: "AppIcon", withExtension: "icns"),
+           let applicationIcon = NSImage(contentsOf: iconURL) {
+            NSApp.applicationIconImage = applicationIcon
+        }
+
         statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
         if let button = statusBarItem?.button {
