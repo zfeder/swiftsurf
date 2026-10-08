@@ -109,6 +109,6 @@ remove normal WebKit website data and local history.
 
 ## License
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development and contribution
-guidelines. A formal open-source license should be selected before accepting
-external code contributions.
+SwiftSurf is released under the [MIT License](LICENSE). See
+[CONTRIBUTING.md](CONTRIBUTING.md) for development and contribution
+guidelines.

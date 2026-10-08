@@ -35,4 +35,4 @@ xcodebuild \
 - Make sure the GitHub Actions check passes.
 
 By contributing, you agree that your work may be distributed under the
-project's eventual open-source license.
+project's MIT License.
