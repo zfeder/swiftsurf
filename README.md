@@ -5,6 +5,12 @@
   Search, browse, and get back to your work without opening another full-size browser window.
 </p>
 
+[![CI](https://github.com/zfeder/swiftsurf/actions/workflows/ci.yml/badge.svg)](https://github.com/zfeder/swiftsurf/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/zfeder/swiftsurf?display_name=tag&sort=semver)](https://github.com/zfeder/swiftsurf/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/zfeder/swiftsurf/total)](https://github.com/zfeder/swiftsurf/releases)
+
+> **Download SwiftSurf:** [get the latest DMG from GitHub Releases](https://github.com/zfeder/swiftsurf/releases/latest)
+
 ## Why SwiftSurf?
 
 SwiftSurf is a compact `WKWebView` browser that stays one click away in the
@@ -103,5 +109,6 @@ remove normal WebKit website data and local history.
 
 ## License
 
-SwiftSurf is open source. See the repository for the current license and
-contribution details.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development and contribution
+guidelines. A formal open-source license should be selected before accepting
+external code contributions.

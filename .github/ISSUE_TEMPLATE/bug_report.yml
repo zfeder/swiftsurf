@@ -1,0 +1,50 @@
+name: Bug report
+description: Report a reproducible problem in SwiftSurf.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve SwiftSurf. Please include enough detail to reproduce the problem.
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: "macOS 15.5"
+    validations:
+      required: true
+  - type: input
+    id: swiftsurf-version
+    attributes:
+      label: SwiftSurf version
+      placeholder: "v1.0.0"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open SwiftSurf
+        2. Navigate to...
+        3. Click...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Remove private information before posting.

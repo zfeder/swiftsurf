@@ -1,0 +1,30 @@
+name: SwiftSurf CI
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: macos-14
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Build and test
+        run: |
+          xcodebuild \
+            -project swiftsurf.xcodeproj \
+            -scheme swiftsurf \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            -only-testing:swiftsurfTests \
+            test
