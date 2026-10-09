@@ -48,4 +48,5 @@ extension Notification.Name {
     static let swiftSurfFocusAddress = Notification.Name("SwiftSurfFocusAddress")
     static let swiftSurfShowHistory = Notification.Name("SwiftSurfShowHistory")
     static let swiftSurfDockIconPreferenceChanged = Notification.Name("SwiftSurfDockIconPreferenceChanged")
+    static let swiftSurfLanguageChanged = Notification.Name("SwiftSurfLanguageChanged")
 }

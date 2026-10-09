@@ -30,11 +30,26 @@ private struct SettingsForm: View {
     var body: some View {
         Form {
             Section("Language") {
-                Picker("Interface language", selection: $appLanguage) {
+                VStack(alignment: .leading, spacing: 4) {
                     ForEach(AppLanguage.allCases) { language in
-                        Text(language.displayName).tag(language.rawValue)
+                        Button {
+                            appLanguage = language.rawValue
+                            NotificationCenter.default.post(name: .swiftSurfLanguageChanged, object: nil)
+                        } label: {
+                            HStack {
+                                Text(language.displayName)
+                                Spacer()
+                                if appLanguage == language.rawValue {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(Color.accentColor)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .contentShape(Rectangle())
                     }
                 }
+                .padding(.vertical, 2)
             }
             Section("Startup") {
                 TextField("Home page URL", text: $homePage)

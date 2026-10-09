@@ -269,6 +269,7 @@ struct ContentView: View {
     @State private var address = ""
     @State private var showingHistory = false
     @State private var showingSettings = false
+    @State private var languageRevision = 0
     @FocusState private var addressIsFocused: Bool
 
     private var tab: BrowserTab? { session.selectedTab }
@@ -343,6 +344,9 @@ struct ContentView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .swiftSurfFocusAddress)) { _ in
             addressIsFocused = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .swiftSurfLanguageChanged)) { _ in
+            languageRevision += 1
         }
     }
 
