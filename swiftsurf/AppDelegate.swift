@@ -15,6 +15,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
            let applicationIcon = NSImage(contentsOf: iconURL) {
             NSApp.applicationIconImage = applicationIcon
         }
+        applyDockIconVisibility()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(dockIconPreferenceChanged(_:)),
+            name: .swiftSurfDockIconPreferenceChanged,
+            object: nil
+        )
 
         statusBarItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
@@ -32,6 +39,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         popover.animates = true
         popover.contentSize = ResizablePopover.savedContentSize
         browserPopover = popover
+    }
+
+    @objc private func dockIconPreferenceChanged(_ notification: Notification) {
+        applyDockIconVisibility()
+    }
+
+    private func applyDockIconVisibility() {
+        let showDockIcon = UserDefaults.standard.object(forKey: "showDockIcon") as? Bool ?? true
+        NSApp.setActivationPolicy(showDockIcon ? .regular : .accessory)
     }
 
     @objc private func togglePopover() {

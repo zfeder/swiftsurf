@@ -40,6 +40,7 @@ expect from a desktop browser, while keeping its footprint deliberately small.
 - **Native downloads** with the macOS save panel
 - **Keyboard shortcuts** for the address bar, tabs, reload, and history
 - **Persistent window size** and configurable home page
+- **Settings tab** with home page and Dock icon visibility controls
 - **Native error states** with retry actions
 - **Camera, microphone, and location permissions** requested by websites only when approved
 
@@ -115,7 +116,9 @@ at the Releases page above.
 Normal browsing uses WebKit's standard local website data store so logins and
 preferences work as expected. Private tabs use a non-persistent store and are
 not added to SwiftSurf history. Use **Clear browsing data** in the tab menu to
-remove normal WebKit website data and local history.
+remove normal WebKit website data and local history. SwiftSurf can also hide
+its Dock icon while remaining available from the menu bar; this preference is
+available in the Settings tab.
 
 ## License
 

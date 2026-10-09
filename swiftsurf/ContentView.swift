@@ -267,6 +267,7 @@ struct ContentView: View {
     @AppStorage("homePage") private var homePage = "https://www.google.com/"
     @State private var address = ""
     @State private var showingHistory = false
+    @State private var showingSettings = false
     @FocusState private var addressIsFocused: Bool
 
     private var tab: BrowserTab? { session.selectedTab }
@@ -274,28 +275,32 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 0) {
             tabBar
-            toolbar
+            if showingSettings {
+                SettingsTabView()
+            } else {
+                toolbar
 
-            if let tab {
-                WebViewController(webView: tab.webView)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .layoutPriority(1)
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .padding(.horizontal, 12)
-                    .padding(.bottom, 10)
-                    .overlay(alignment: .bottomTrailing) {
-                        ResizeHandle()
-                            .frame(width: 28, height: 28)
-                            .padding(.trailing, 8)
-                            .padding(.bottom, 6)
-                    }
-                    .overlay {
-                        if let error = tab.error {
-                            NavigationErrorView(message: error) {
-                                tab.webView.reload()
+                if let tab {
+                    WebViewController(webView: tab.webView)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .layoutPriority(1)
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .padding(.horizontal, 12)
+                        .padding(.bottom, 10)
+                        .overlay(alignment: .bottomTrailing) {
+                            ResizeHandle()
+                                .frame(width: 28, height: 28)
+                                .padding(.trailing, 8)
+                                .padding(.bottom, 6)
+                        }
+                        .overlay {
+                            if let error = tab.error {
+                                NavigationErrorView(message: error) {
+                                    tab.webView.reload()
+                                }
                             }
                         }
-                    }
+                }
             }
         }
         .frame(minWidth: ResizablePopover.minimumContentSize.width,
@@ -341,6 +346,7 @@ struct ContentView: View {
         HStack(spacing: 5) {
             ForEach(session.tabs) { item in
                 Button {
+                    showingSettings = false
                     session.selectedTabID = item.id
                     syncAddress()
                 } label: {
@@ -366,12 +372,26 @@ struct ContentView: View {
                 .buttonStyle(.plain)
             }
 
-            Button { session.addTab() } label: {
+            Button {
+                showingSettings = false
+                session.addTab()
+            } label: {
                 Image(systemName: "plus")
                     .frame(width: 24, height: 24)
             }
             .buttonStyle(.plain)
             .keyboardShortcut("t", modifiers: .command)
+
+            Button {
+                showingSettings = true
+            } label: {
+                Image(systemName: "gearshape")
+                    .frame(width: 24, height: 24)
+                    .background(showingSettings ? Color.primary.opacity(0.1) : .clear)
+                    .clipShape(RoundedRectangle(cornerRadius: 7))
+            }
+            .buttonStyle(.plain)
+            .help("Settings")
 
             Spacer()
             if session.privateMode {
