@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9A6E1B1C2C413E9700F8311C /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A6E1B1B2C413E9700F8311C /* Localization.swift */; };
 		9A2F99D22C41D342002F3C56 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A2F99D12C41D342002F3C56 /* SettingsView.swift */; };
 		9A87F2412E0DD68900941B5D /* ResizablePopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A87F2402E0DD68100941B5D /* ResizablePopover.swift */; };
 		9AAC0DB42C413E2900F8311C /* swiftsurfApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAC0DB32C413E2900F8311C /* swiftsurfApp.swift */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9A6E1B1B2C413E9700F8311C /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		9A2F99D12C41D342002F3C56 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		9A87F2402E0DD68100941B5D /* ResizablePopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResizablePopover.swift; sourceTree = "<group>"; };
 		9AAC0DB02C413E2900F8311C /* swiftsurf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = swiftsurf.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -103,6 +105,7 @@
 		9AAC0DB22C413E2900F8311C /* swiftsurf */ = {
 			isa = PBXGroup;
 			children = (
+				9A6E1B1B2C413E9700F8311C /* Localization.swift */,
 				9A87F2402E0DD68100941B5D /* ResizablePopover.swift */,
 				9AAC0DB32C413E2900F8311C /* swiftsurfApp.swift */,
 				9AAC0DB52C413E2900F8311C /* ContentView.swift */,
@@ -272,6 +275,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A6E1B1C2C413E9700F8311C /* Localization.swift in Sources */,
 				9A87F2412E0DD68900941B5D /* ResizablePopover.swift in Sources */,
 				9A2F99D22C41D342002F3C56 /* SettingsView.swift in Sources */,
 				9AAC0DDF2C413E7600F8311C /* AppDelegate.swift in Sources */,

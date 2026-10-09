@@ -265,12 +265,16 @@ private final class BrowserNavigationDelegate: NSObject, WKNavigationDelegate, W
 struct ContentView: View {
     @StateObject private var session = BrowserSession()
     @AppStorage("homePage") private var homePage = "https://www.google.com/"
+    @AppStorage("appLanguage") private var appLanguage = AppLanguage.english.rawValue
     @State private var address = ""
     @State private var showingHistory = false
     @State private var showingSettings = false
     @FocusState private var addressIsFocused: Bool
 
     private var tab: BrowserTab? { session.selectedTab }
+    private var strings: AppStrings {
+        AppStrings(language: AppLanguage(rawValue: appLanguage) ?? .english)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -395,7 +399,7 @@ struct ContentView: View {
 
             Spacer()
             if session.privateMode {
-                Label("Private", systemImage: "eye.slash")
+                Label(strings["private"], systemImage: "eye.slash")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.purple)
             }
@@ -417,7 +421,7 @@ struct ContentView: View {
                 Image(systemName: tab?.url?.scheme == "https" ? "lock.fill" : "globe")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.secondary)
-                TextField("Search or enter website address", text: $address) {
+                TextField(strings["search"], text: $address) {
                     tab?.load(address)
                 }
                 .textFieldStyle(.plain)
@@ -437,26 +441,26 @@ struct ContentView: View {
 
             CircleIconButton(systemName: "arrow.clockwise") { tab?.reload() }
             Menu {
-                Button(tab.map(session.isBookmarked) == true ? "Remove Bookmark" : "Add Bookmark") {
+                Button(tab.map(session.isBookmarked) == true ? strings["removeBookmark"] : strings["addBookmark"]) {
                     if let tab { session.toggleBookmark(for: tab) }
                 }
-                Menu("Bookmarks") {
+                Menu(strings["bookmarks"]) {
                     ForEach(session.bookmarks) { bookmark in
                         Button(bookmark.title) { tab?.load(bookmark.url) }
                     }
                 }
-                Menu("Recent") {
+                Menu(strings["recent"]) {
                     ForEach(session.history.prefix(10)) { entry in
                         Button(entry.title) { tab?.load(entry.url) }
                     }
-                    Button("Show history") {
+                    Button(strings["showHistory"]) {
                         showingHistory = true
                     }
                 }
                 Divider()
-                Toggle("Private browsing", isOn: Binding(get: { session.privateMode }, set: session.setPrivateMode))
-                Button("Clear browsing data", role: .destructive) { session.clearBrowsingData() }
-                Button("Show downloads") {
+                Toggle(strings["privateBrowsing"], isOn: Binding(get: { session.privateMode }, set: session.setPrivateMode))
+                Button(strings["clearData"], role: .destructive) { session.clearBrowsingData() }
+                Button(strings["downloads"]) {
                     NSWorkspace.shared.open(FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0])
                 }
             } label: {
@@ -478,14 +482,17 @@ struct ContentView: View {
 }
 
 private struct NavigationErrorView: View {
+    @AppStorage("appLanguage") private var appLanguage = AppLanguage.english.rawValue
     let message: String
     let retry: () -> Void
+
     var body: some View {
+        let strings = AppStrings(language: AppLanguage(rawValue: appLanguage) ?? .english)
         VStack(spacing: 10) {
             Image(systemName: "wifi.exclamationmark").font(.title2).foregroundStyle(.secondary)
-            Text("Unable to load this page").font(.headline)
+            Text(strings["unable"]).font(.headline)
             Text(message).font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center).lineLimit(3)
-            Button("Try Again", action: retry).buttonStyle(.borderedProminent)
+            Button(strings["tryAgain"], action: retry).buttonStyle(.borderedProminent)
         }
         .padding(24)
         .frame(maxWidth: 320)
@@ -495,13 +502,16 @@ private struct NavigationErrorView: View {
 }
 
 private struct HistoryView: View {
+    @AppStorage("appLanguage") private var appLanguage = AppLanguage.english.rawValue
     let entries: [HistoryEntry]
     let select: (HistoryEntry) -> Void
+
     var body: some View {
+        let strings = AppStrings(language: AppLanguage(rawValue: appLanguage) ?? .english)
         VStack(alignment: .leading, spacing: 12) {
-            Text("Recent pages").font(.title2.weight(.semibold))
+            Text(strings["recentPages"]).font(.title2.weight(.semibold))
             if entries.isEmpty {
-                Text("No recent pages").foregroundStyle(.secondary)
+                Text(strings["noRecent"]).foregroundStyle(.secondary)
             } else {
                 List(entries) { entry in
                     Button { select(entry) } label: {

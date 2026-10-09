@@ -41,6 +41,7 @@ expect from a desktop browser, while keeping its footprint deliberately small.
 - **Keyboard shortcuts** for the address bar, tabs, reload, and history
 - **Persistent window size** and configurable home page
 - **Settings tab** with home page and Dock icon visibility controls
+- **Five interface languages**: English, Italian, Spanish, French, and German
 - **Native error states** with retry actions
 - **Camera, microphone, and location permissions** requested by websites only when approved
 

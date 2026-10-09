@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct swiftsurfApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @AppStorage("appLanguage") private var appLanguage = AppLanguage.english.rawValue
 
     var body: some Scene {
         // La scena delle impostazioni è definita qui.
@@ -19,22 +20,26 @@ struct swiftsurfApp: App {
         }
         .commands {
             CommandGroup(replacing: .newItem) {
-                Button("New Tab") {
+                Button(AppStrings(language: currentLanguage)["newTab"]) {
                     NotificationCenter.default.post(name: .swiftSurfNewTab, object: nil)
                 }
                 .keyboardShortcut("t", modifiers: .command)
             }
             CommandGroup(after: .textEditing) {
-                Button("Focus Address Bar") {
+                Button(AppStrings(language: currentLanguage)["focusAddress"]) {
                     NotificationCenter.default.post(name: .swiftSurfFocusAddress, object: nil)
                 }
                 .keyboardShortcut("l", modifiers: .command)
-                Button("Show History") {
+                Button(AppStrings(language: currentLanguage)["showHistory"]) {
                     NotificationCenter.default.post(name: .swiftSurfShowHistory, object: nil)
                 }
                 .keyboardShortcut("y", modifiers: [.command, .shift])
             }
         }
+    }
+
+    private var currentLanguage: AppLanguage {
+        AppLanguage(rawValue: appLanguage) ?? .english
     }
 }
 
