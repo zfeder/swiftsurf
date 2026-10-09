@@ -19,6 +19,12 @@ struct swiftsurfApp: App {
             SettingsView()
         }
         .commands {
+            CommandGroup(replacing: .appTermination) {
+                Button(AppStrings(language: currentLanguage)["quit"]) {
+                    NSApp.terminate(nil)
+                }
+                .keyboardShortcut("q", modifiers: .command)
+            }
             CommandGroup(replacing: .newItem) {
                 Button(AppStrings(language: currentLanguage)["newTab"]) {
                     NotificationCenter.default.post(name: .swiftSurfNewTab, object: nil)

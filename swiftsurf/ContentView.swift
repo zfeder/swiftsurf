@@ -467,6 +467,10 @@ struct ContentView: View {
                 Button(strings["downloads"]) {
                     NSWorkspace.shared.open(FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0])
                 }
+                Divider()
+                Button(strings["quit"]) {
+                    NSApp.terminate(nil)
+                }
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .font(.title3)

@@ -34,7 +34,7 @@ struct AppStrings {
                 "removeBookmark": "Remove Bookmark", "addBookmark": "Add Bookmark",
                 "unable": "Unable to load this page", "tryAgain": "Try Again",
                 "recentPages": "Recent pages", "noRecent": "No recent pages",
-                "focusAddress": "Focus Address Bar"
+                "focusAddress": "Focus Address Bar", "quit": "Quit SwiftSurf"
             ]
         case .italian:
             [
@@ -45,7 +45,7 @@ struct AppStrings {
                 "removeBookmark": "Rimuovi preferito", "addBookmark": "Aggiungi preferito",
                 "unable": "Impossibile caricare questa pagina", "tryAgain": "Riprova",
                 "recentPages": "Pagine recenti", "noRecent": "Nessuna pagina recente",
-                "focusAddress": "Attiva barra degli indirizzi"
+                "focusAddress": "Attiva barra degli indirizzi", "quit": "Esci da SwiftSurf"
             ]
         case .spanish:
             [
@@ -56,7 +56,7 @@ struct AppStrings {
                 "removeBookmark": "Quitar marcador", "addBookmark": "Añadir marcador",
                 "unable": "No se puede cargar esta página", "tryAgain": "Reintentar",
                 "recentPages": "Páginas recientes", "noRecent": "No hay páginas recientes",
-                "focusAddress": "Activar barra de direcciones"
+                "focusAddress": "Activar barra de direcciones", "quit": "Salir de SwiftSurf"
             ]
         case .french:
             [
@@ -67,7 +67,7 @@ struct AppStrings {
                 "removeBookmark": "Supprimer le signet", "addBookmark": "Ajouter aux signets",
                 "unable": "Impossible de charger cette page", "tryAgain": "Réessayer",
                 "recentPages": "Pages récentes", "noRecent": "Aucune page récente",
-                "focusAddress": "Activer la barre d’adresse"
+                "focusAddress": "Activer la barre d’adresse", "quit": "Quitter SwiftSurf"
             ]
         case .german:
             [
@@ -78,7 +78,7 @@ struct AppStrings {
                 "removeBookmark": "Lesezeichen entfernen", "addBookmark": "Lesezeichen hinzufügen",
                 "unable": "Diese Seite konnte nicht geladen werden", "tryAgain": "Erneut versuchen",
                 "recentPages": "Zuletzt besuchte Seiten", "noRecent": "Keine zuletzt besuchten Seiten",
-                "focusAddress": "Adressleiste aktivieren"
+                "focusAddress": "Adressleiste aktivieren", "quit": "SwiftSurf beenden"
             ]
         }
     }
