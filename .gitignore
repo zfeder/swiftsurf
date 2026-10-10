@@ -2,3 +2,5 @@
 DerivedData/
 dist/
 *.xcuserstate
+*.profraw
+.DS_Store
