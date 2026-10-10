@@ -18,7 +18,24 @@
 		9AAC0DD02C413E2B00F8311C /* swiftsurfUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAC0DCF2C413E2B00F8311C /* swiftsurfUITests.swift */; };
 		9AAC0DD22C413E2B00F8311C /* swiftsurfUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAC0DD12C413E2B00F8311C /* swiftsurfUITestsLaunchTests.swift */; };
 		9AAC0DDF2C413E7600F8311C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAC0DDE2C413E7600F8311C /* AppDelegate.swift */; };
-		9AAC0DE12C413E9700F8311C /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9AAC0DE02C413E9700F8311C /* Info.plist */; };
+		5F5F00000000000000000003 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F00000000000000000002 /* MenuBarController.swift */; };
+		5F5F00000000000000000005 /* GlobalHotKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F00000000000000000004 /* GlobalHotKey.swift */; };
+		5F5F00000000000000000008 /* BrowserSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F00000000000000000007 /* BrowserSession.swift */; };
+		5F5F0000000000000000000A /* BrowserTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F00000000000000000009 /* BrowserTab.swift */; };
+		5F5F0000000000000000000C /* DownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F0000000000000000000B /* DownloadManager.swift */; };
+		5F5F0000000000000000000E /* ContentBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F0000000000000000000D /* ContentBlocker.swift */; };
+		5F5F00000000000000000010 /* AddressResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F0000000000000000000F /* AddressResolver.swift */; };
+		5F5F00000000000000000012 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F00000000000000000011 /* Models.swift */; };
+		5F5F00000000000000000014 /* PersistentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F00000000000000000013 /* PersistentStore.swift */; };
+		5F5F00000000000000000016 /* PageScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F00000000000000000015 /* PageScripts.swift */; };
+		5F5F00000000000000000019 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F00000000000000000018 /* TabBarView.swift */; };
+		5F5F0000000000000000001B /* ToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F0000000000000000001A /* ToolbarView.swift */; };
+		5F5F0000000000000000001D /* PageAccessoryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F0000000000000000001C /* PageAccessoryViews.swift */; };
+		5F5F0000000000000000001F /* LibraryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F0000000000000000001E /* LibraryViews.swift */; };
+		5F5F00000000000000000021 /* BrowserComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F00000000000000000020 /* BrowserComponents.swift */; };
+		5F5F00000000000000000024 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F00000000000000000023 /* Preferences.swift */; };
+		5F5F00000000000000000026 /* BrowserCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F00000000000000000025 /* BrowserCommand.swift */; };
+		5F5F00000000000000000028 /* AddressResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F5F00000000000000000027 /* AddressResolverTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +72,24 @@
 		9AAC0DD12C413E2B00F8311C /* swiftsurfUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = swiftsurfUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		9AAC0DDE2C413E7600F8311C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9AAC0DE02C413E9700F8311C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5F5F00000000000000000002 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
+		5F5F00000000000000000004 /* GlobalHotKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalHotKey.swift; sourceTree = "<group>"; };
+		5F5F00000000000000000007 /* BrowserSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserSession.swift; sourceTree = "<group>"; };
+		5F5F00000000000000000009 /* BrowserTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserTab.swift; sourceTree = "<group>"; };
+		5F5F0000000000000000000B /* DownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManager.swift; sourceTree = "<group>"; };
+		5F5F0000000000000000000D /* ContentBlocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlocker.swift; sourceTree = "<group>"; };
+		5F5F0000000000000000000F /* AddressResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressResolver.swift; sourceTree = "<group>"; };
+		5F5F00000000000000000011 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		5F5F00000000000000000013 /* PersistentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentStore.swift; sourceTree = "<group>"; };
+		5F5F00000000000000000015 /* PageScripts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageScripts.swift; sourceTree = "<group>"; };
+		5F5F00000000000000000018 /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
+		5F5F0000000000000000001A /* ToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarView.swift; sourceTree = "<group>"; };
+		5F5F0000000000000000001C /* PageAccessoryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageAccessoryViews.swift; sourceTree = "<group>"; };
+		5F5F0000000000000000001E /* LibraryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViews.swift; sourceTree = "<group>"; };
+		5F5F00000000000000000020 /* BrowserComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserComponents.swift; sourceTree = "<group>"; };
+		5F5F00000000000000000023 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		5F5F00000000000000000025 /* BrowserCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserCommand.swift; sourceTree = "<group>"; };
+		5F5F00000000000000000027 /* AddressResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressResolverTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,12 +140,10 @@
 		9AAC0DB22C413E2900F8311C /* swiftsurf */ = {
 			isa = PBXGroup;
 			children = (
-				9A6E1B1B2C413E9700F8311C /* Localization.swift */,
-				9A87F2402E0DD68100941B5D /* ResizablePopover.swift */,
-				9AAC0DB32C413E2900F8311C /* swiftsurfApp.swift */,
-				9AAC0DB52C413E2900F8311C /* ContentView.swift */,
-				9AAC0DDE2C413E7600F8311C /* AppDelegate.swift */,
-				9A2F99D12C41D342002F3C56 /* SettingsView.swift */,
+				5F5F00000000000000000001 /* App */,
+				5F5F00000000000000000006 /* Browser */,
+				5F5F00000000000000000017 /* Views */,
+				5F5F00000000000000000022 /* Support */,
 				9AAC0DB72C413E2A00F8311C /* Assets.xcassets */,
 				9AAC0DBC2C413E2A00F8311C /* swiftsurf.entitlements */,
 				9AAC0DB92C413E2A00F8311C /* Preview Content */,
@@ -131,6 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				9AAC0DC52C413E2B00F8311C /* swiftsurfTests.swift */,
+				5F5F00000000000000000027 /* AddressResolverTests.swift */,
 			);
 			path = swiftsurfTests;
 			sourceTree = "<group>";
@@ -142,6 +176,57 @@
 				9AAC0DD12C413E2B00F8311C /* swiftsurfUITestsLaunchTests.swift */,
 			);
 			path = swiftsurfUITests;
+			sourceTree = "<group>";
+		};
+		5F5F00000000000000000001 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				9AAC0DB32C413E2900F8311C /* swiftsurfApp.swift */,
+				9AAC0DDE2C413E7600F8311C /* AppDelegate.swift */,
+				5F5F00000000000000000002 /* MenuBarController.swift */,
+				5F5F00000000000000000004 /* GlobalHotKey.swift */,
+				9A87F2402E0DD68100941B5D /* ResizablePopover.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		5F5F00000000000000000006 /* Browser */ = {
+			isa = PBXGroup;
+			children = (
+				5F5F00000000000000000007 /* BrowserSession.swift */,
+				5F5F00000000000000000009 /* BrowserTab.swift */,
+				5F5F0000000000000000000B /* DownloadManager.swift */,
+				5F5F0000000000000000000D /* ContentBlocker.swift */,
+				5F5F0000000000000000000F /* AddressResolver.swift */,
+				5F5F00000000000000000011 /* Models.swift */,
+				5F5F00000000000000000013 /* PersistentStore.swift */,
+				5F5F00000000000000000015 /* PageScripts.swift */,
+			);
+			path = Browser;
+			sourceTree = "<group>";
+		};
+		5F5F00000000000000000017 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				9AAC0DB52C413E2900F8311C /* ContentView.swift */,
+				5F5F00000000000000000018 /* TabBarView.swift */,
+				5F5F0000000000000000001A /* ToolbarView.swift */,
+				5F5F0000000000000000001C /* PageAccessoryViews.swift */,
+				5F5F0000000000000000001E /* LibraryViews.swift */,
+				5F5F00000000000000000020 /* BrowserComponents.swift */,
+				9A2F99D12C41D342002F3C56 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5F5F00000000000000000022 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				5F5F00000000000000000023 /* Preferences.swift */,
+				5F5F00000000000000000025 /* BrowserCommand.swift */,
+				9A6E1B1B2C413E9700F8311C /* Localization.swift */,
+			);
+			path = Support;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -250,7 +335,6 @@
 			files = (
 				9AAC0DBB2C413E2A00F8311C /* Preview Assets.xcassets in Resources */,
 				9AAC0DB82C413E2A00F8311C /* Assets.xcassets in Resources */,
-				9AAC0DE12C413E9700F8311C /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,6 +365,23 @@
 				9AAC0DDF2C413E7600F8311C /* AppDelegate.swift in Sources */,
 				9AAC0DB62C413E2900F8311C /* ContentView.swift in Sources */,
 				9AAC0DB42C413E2900F8311C /* swiftsurfApp.swift in Sources */,
+				5F5F00000000000000000003 /* MenuBarController.swift in Sources */,
+				5F5F00000000000000000005 /* GlobalHotKey.swift in Sources */,
+				5F5F00000000000000000008 /* BrowserSession.swift in Sources */,
+				5F5F0000000000000000000A /* BrowserTab.swift in Sources */,
+				5F5F0000000000000000000C /* DownloadManager.swift in Sources */,
+				5F5F0000000000000000000E /* ContentBlocker.swift in Sources */,
+				5F5F00000000000000000010 /* AddressResolver.swift in Sources */,
+				5F5F00000000000000000012 /* Models.swift in Sources */,
+				5F5F00000000000000000014 /* PersistentStore.swift in Sources */,
+				5F5F00000000000000000016 /* PageScripts.swift in Sources */,
+				5F5F00000000000000000019 /* TabBarView.swift in Sources */,
+				5F5F0000000000000000001B /* ToolbarView.swift in Sources */,
+				5F5F0000000000000000001D /* PageAccessoryViews.swift in Sources */,
+				5F5F0000000000000000001F /* LibraryViews.swift in Sources */,
+				5F5F00000000000000000021 /* BrowserComponents.swift in Sources */,
+				5F5F00000000000000000024 /* Preferences.swift in Sources */,
+				5F5F00000000000000000026 /* BrowserCommand.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,6 +390,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9AAC0DC62C413E2B00F8311C /* swiftsurfTests.swift in Sources */,
+				5F5F00000000000000000028 /* AddressResolverTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -449,6 +551,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = swiftsurf/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SwiftSurf;
 				INFOPLIST_KEY_CFBundleName = SwiftSurf;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -478,6 +581,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = swiftsurf/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = SwiftSurf;
 				INFOPLIST_KEY_CFBundleName = SwiftSurf;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
