@@ -29,21 +29,21 @@ expect from a desktop browser, while keeping its footprint deliberately small.
 
 ## Highlights
 
-- **Instant access** from the macOS menu bar
+- **Instant access** from the macOS menu bar, or from any app with a global shortcut (`⌥Space` by default)
+- **Keep open or detach**: pin the popup so it stays visible, or drag it away from the menu bar to turn it into a floating window
 - **Responsive popup** with a native bottom-right resize handle
-- **Multiple tabs** with independent navigation state
-- **Modern web rendering** using WebKit and a desktop Safari-compatible user agent
-- **Search or navigate** from one intelligent address bar
-- **Back, forward, reload, stop**, and trackpad navigation gestures
-- **Bookmarks and recent pages** stored locally
-- **Private browsing** with a non-persistent WebKit data store
-- **Native downloads** with the macOS save panel
-- **Keyboard shortcuts** for the address bar, tabs, reload, and history
-- **Persistent window size** and configurable home page
-- **Settings tab** with home page and Dock icon visibility controls
-- **Five interface languages**: English, Italian, Spanish, French, and German
-- **Native error states** with retry actions
-- **Camera, microphone, and location permissions** requested by websites only when approved
+- **Tabs** with favicons, drag-to-reorder, `⌘1`–`⌘9`, and reopening of closed tabs
+- **Session restore**: your tabs come back next time, loaded only when you open them
+- **Smart address bar** with suggestions from bookmarks and history, `localhost`/IP support, and a choice of search engine (Google, DuckDuckGo, Bing, Ecosia, Startpage, Kagi)
+- **Built-in tracker blocking** using a native WebKit content rule list
+- **Find in page**, per-site **zoom**, **reader mode**, **Picture in Picture**, and **request mobile website**
+- **Favorites bar** and a **start page** with your bookmarks and recent pages
+- **Searchable history** and a **downloads manager** with progress, cancel, and Show in Finder
+- **Private browsing**: private tabs share one temporary data store, which is discarded when private mode ends
+- **Sign-in pop-ups** (OAuth, payments) open in their own tab and close themselves when they finish
+- **Web page dialogs and file uploads**: `alert`, `confirm`, `prompt`, and `<input type="file">` work inside the popup
+- **Camera, microphone, and location** available to websites only after you approve access
+- **Five interface languages**: English, Italian, Spanish, French, and German (follows the system language by default)
 
 ## Install
 
@@ -106,18 +106,29 @@ at the Releases page above.
 
 | Shortcut | Action |
 | --- | --- |
+| `⌥Space` | Show or hide SwiftSurf from any app (configurable in Settings) |
 | `⌘L` | Focus the address bar |
-| `⌘T` | Open a new tab |
+| `⌘T` / `⇧⌘T` | Open a new tab / reopen the last closed tab |
 | `⌘W` | Close the current tab |
-| `⌘R` | Reload the current page |
+| `⌘1`…`⌘9`, `⌃Tab`, `⌃⇧Tab` | Switch tabs |
+| `⌘R` / `⌘[` / `⌘]` | Reload / back / forward |
+| `⌘F`, `⌘G`, `⇧⌘G` | Find in page, next and previous match |
+| `⌘=` / `⌘-` / `⌘0` | Zoom in / zoom out / actual size (remembered per site) |
+| `⇧⌘R` | Reader mode |
+| `⌘D` | Add or remove bookmark |
 | `⇧⌘Y` | Show browsing history |
+| `⌥⌘L` | Show downloads |
+| `⌘`-click | Open a link in a background tab |
 
 ## Privacy
 
 Normal browsing uses WebKit's standard local website data store so logins and
 preferences work as expected. Private tabs use a non-persistent store and are
 not added to SwiftSurf history. Use **Clear browsing data** in the tab menu to
-remove normal WebKit website data and local history. SwiftSurf can also hide
+remove normal WebKit website data, local history, and saved zoom levels.
+Tracker blocking is on by default and can be turned off in Settings. Bookmarks
+and history are stored as JSON files in SwiftSurf's Application Support folder.
+Downloads are saved directly to your Downloads folder. SwiftSurf can also hide
 its Dock icon while remaining available from the menu bar; this preference is
 available in the Settings tab.
 
